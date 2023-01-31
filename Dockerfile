@@ -1,4 +1,4 @@
-FROM ubuntu:21.04
+FROM ubuntu:21
 
 LABEL MAINTAINER="Robin Genz <mail@robingenz.dev>"
 
@@ -17,8 +17,6 @@ ENV DEBIAN_FRONTEND=noninteractive
 ENV LANG=en_US.UTF-8
 
 WORKDIR /tmp
-
-RUN apt-get update -q
 
 # General packages
 RUN apt-get install -qy \
