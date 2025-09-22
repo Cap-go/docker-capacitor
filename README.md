@@ -9,7 +9,7 @@
 Pull from GitHub Container Registry:  
 
 ```
-docker pull ghcr.io/robingenz/docker-ionic-capacitor:latest
+docker pull capgo/capacitor:latest
 ```
 
 ### Build image
