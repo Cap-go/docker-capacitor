@@ -1,22 +1,28 @@
-FROM ubuntu:21
+FROM ubuntu:25.04
 
-LABEL MAINTAINER="Robin Genz <mail@robingenz.dev>"
+LABEL MAINTAINER="Martin Donadieu <martin@capgo.app>"
 
-ARG JAVA_VERSION=11
-ARG NODEJS_VERSION=18
+ARG JAVA_VERSION=17
+ARG NODEJS_VERSION=24
 # See https://developer.android.com/studio/index.html#command-tools
-ARG ANDROID_SDK_VERSION=7583922
-# See https://androidsdkmanager.azurewebsites.net/Buildtools
-ARG ANDROID_BUILD_TOOLS_VERSION=33.0.0
+ARG ANDROID_SDK_VERSION=11076708
+# See https://developer.android.com/tools/releases/build-tools
+ARG ANDROID_BUILD_TOOLS_VERSION=34.0.0
 # See https://developer.android.com/studio/releases/platforms
-ARG ANDROID_PLATFORMS_VERSION=31
+ARG ANDROID_PLATFORMS_VERSION=34
 # See https://gradle.org/releases/
-ARG GRADLE_VERSION=7.4.2
+ARG GRADLE_VERSION=8.2.1
+# See https://www.npmjs.com/package/@ionic/cli
+ARG IONIC_VERSION=7.2.0
+# See https://www.npmjs.com/package/@capacitor/cli
+ARG CAPACITOR_VERSION=7.4.3
 
 ENV DEBIAN_FRONTEND=noninteractive
 ENV LANG=en_US.UTF-8
 
 WORKDIR /tmp
+
+RUN apt-get update -q
 
 # General packages
 RUN apt-get install -qy \
@@ -29,7 +35,7 @@ RUN apt-get install -qy \
     git \
     unzip \
     p7zip p7zip-full \
-    python \
+    python3 \
     openjdk-${JAVA_VERSION}-jre \
     openjdk-${JAVA_VERSION}-jdk
 
@@ -39,8 +45,8 @@ RUN locale-gen en_US.UTF-8 && update-locale
 # Install Gradle
 ENV GRADLE_HOME=/opt/gradle
 RUN mkdir $GRADLE_HOME \
-    && curl -sL https://downloads.gradle-dn.com/distributions/gradle-${GRADLE_VERSION}-bin.zip -o gradle-${GRADLE_VERSION}-bin.zip \
-    unzip -d $GRADLE_HOME gradle-${GRADLE_VERSION}-bin.zip
+    && curl -sL https://services.gradle.org/distributions/gradle-${GRADLE_VERSION}-bin.zip -o gradle-${GRADLE_VERSION}-bin.zip \
+    && unzip -d $GRADLE_HOME gradle-${GRADLE_VERSION}-bin.zip
 ENV PATH=$PATH:/opt/gradle/gradle-${GRADLE_VERSION}/bin
 
 # Install Android SDK tools
@@ -53,10 +59,16 @@ RUN curl -sL https://dl.google.com/android/repository/commandlinetools-linux-${A
 ENV PATH=$PATH:${ANDROID_HOME}/cmdline-tools:${ANDROID_HOME}/platform-tools
 
 # Install NodeJS
-RUN curl -sL https://deb.nodesource.com/setup_${NODEJS_VERSION}.x | bash - \
+ENV NODEJS_HOME=/opt/nodejs
+RUN mkdir $NODEJS_HOME \
+    && curl -sL https://deb.nodesource.com/setup_${NODEJS_VERSION}.x | bash - \
     && apt-get update -q && apt-get install -qy nodejs
-ENV NPM_CONFIG_PREFIX=${HOME}/.npm-global
-ENV PATH=$PATH:${HOME}/.npm-global/bin
+ENV NPM_CONFIG_PREFIX=${NODEJS_HOME}/.npm-global
+ENV PATH=$PATH:${NODEJS_HOME}/.npm-global/bin
+
+# Install Ionic CLI and Capacitor CLI
+RUN npm install -g @ionic/cli@${IONIC_VERSION} \
+    && npm install -g @capacitor/cli@${CAPACITOR_VERSION}
 
 # Clean up
 RUN apt-get autoremove -y \
