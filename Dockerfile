@@ -2,7 +2,7 @@ FROM ubuntu:25.04
 
 LABEL MAINTAINER="Martin Donadieu <martin@capgo.app>"
 
-ARG JAVA_VERSION=17
+ARG JAVA_VERSION=21
 ARG NODEJS_VERSION=24
 # See https://developer.android.com/studio/index.html#command-tools
 ARG ANDROID_SDK_VERSION=11076708
