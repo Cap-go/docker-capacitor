@@ -49,3 +49,5 @@ docker run -it Cap-go/docker-capacitor bash
 ## Questions / Issues
 
 If you got any questions or problems using the image, please visit my [GitHub Repository](https://github.com/Cap-go/docker-capacitor) and write an issue.
+
+Credit: original work from Capawesome we forget to served Capgo users https://github.com/capawesome-team/docker-ionic-capacitor
