@@ -4,26 +4,87 @@ on:
   push:
     branches:
       - 'main'
+    tags:
+      - '*'
 
 jobs:
   docker:
     runs-on: ubuntu-latest
     steps:
-      -
-        name: Set up QEMU
+      - name: Checkout
+        uses: actions/checkout@v4
+      - name: Set up QEMU
         uses: docker/setup-qemu-action@v3
-      -
-        name: Set up Docker Buildx
+      - name: Set up Docker Buildx
         uses: docker/setup-buildx-action@v3
-      -
-        name: Login to Docker Hub
+      - name: Login to Docker Hub
         uses: docker/login-action@v3
         with:
           username: ${{ secrets.DOCKERHUB_USERNAME }}
           password: ${{ secrets.DOCKERHUB_TOKEN }}
-      -
-        name: Build and push
+      - name: Docker meta
+        id: meta
+        uses: docker/metadata-action@v5
+        with:
+          images: capgo/capacitor
+          tags: |
+            type=ref,event=branch
+            type=ref,event=tag
+            type=raw,value=latest,enable={{is_default_branch}}
+      - name: Build and push
         uses: docker/build-push-action@v6
         with:
+          context: .
           push: true
-          tags: capgo/capacitor:latest
+          tags: ${{ steps.meta.outputs.tags }}
+          labels: ${{ steps.meta.outputs.labels }}
+      - name: Send Discord notification
+        if: success()
+        env:
+          DISCORD_WEBHOOK: ${{ secrets.WEBHOOK_DISCORD_RELEASE_URL }}
+        run: |
+          if [[ "${{ github.ref_type }}" == "tag" ]]; then
+            VERSION="${{ github.ref_name }}"
+            TITLE="🐳 Docker Image Released: capgo/capacitor:${VERSION}"
+          else
+            VERSION="latest"
+            TITLE="🐳 Docker Image Updated: capgo/capacitor:latest"
+          fi
+
+          COMMIT_MSG=$(git log -1 --pretty=format:'%s')
+          COMMIT_SHA="${{ github.sha }}"
+          SHORT_SHA="${COMMIT_SHA:0:7}"
+
+          curl -H "Content-Type: application/json" \
+            -X POST \
+            -d "{
+              \"username\": \"Docker Release\",
+              \"avatar_url\": \"https://cdn.discordapp.com/avatars/487431320314576937/bd64361e4ba6313d561d54e78c9e7171.png\",
+              \"embeds\": [{
+                \"title\": \"${TITLE}\",
+                \"url\": \"https://hub.docker.com/r/capgo/capacitor\",
+                \"color\": 2105893,
+                \"fields\": [
+                  {
+                    \"name\": \"Image\",
+                    \"value\": \"\`capgo/capacitor:${VERSION}\`\",
+                    \"inline\": true
+                  },
+                  {
+                    \"name\": \"Commit\",
+                    \"value\": \"[${SHORT_SHA}](https://github.com/${{ github.repository }}/commit/${COMMIT_SHA})\",
+                    \"inline\": true
+                  },
+                  {
+                    \"name\": \"Message\",
+                    \"value\": \"${COMMIT_MSG}\",
+                    \"inline\": false
+                  }
+                ],
+                \"footer\": {
+                  \"text\": \"Docker Hub\"
+                },
+                \"timestamp\": \"$(date -u +%Y-%m-%dT%H:%M:%SZ)\"
+              }]
+            }" \
+            "$DISCORD_WEBHOOK"
