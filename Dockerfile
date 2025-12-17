@@ -7,11 +7,11 @@ ARG NODEJS_VERSION=24
 # See https://developer.android.com/studio/index.html#command-tools
 ARG ANDROID_SDK_VERSION=11076708
 # See https://developer.android.com/tools/releases/build-tools
-ARG ANDROID_BUILD_TOOLS_VERSION=34.0.0
+ARG ANDROID_BUILD_TOOLS_VERSION=36.0.0
 # See https://developer.android.com/studio/releases/platforms
-ARG ANDROID_PLATFORMS_VERSION=34
+ARG ANDROID_PLATFORMS_VERSION=36
 # See https://gradle.org/releases/
-ARG GRADLE_VERSION=8.2.1
+ARG GRADLE_VERSION=8.11.1
 # See https://www.npmjs.com/package/@ionic/cli
 ARG IONIC_VERSION=7.2.0
 # See https://www.npmjs.com/package/@capacitor/cli
@@ -55,7 +55,14 @@ RUN curl -sL https://dl.google.com/android/repository/commandlinetools-linux-${A
     && unzip commandlinetools-linux-${ANDROID_SDK_VERSION}_latest.zip \
     && mkdir $ANDROID_HOME && mv cmdline-tools $ANDROID_HOME \
     && yes | $ANDROID_HOME/cmdline-tools/bin/sdkmanager --sdk_root=$ANDROID_HOME --licenses \
-    && $ANDROID_HOME/cmdline-tools/bin/sdkmanager --sdk_root=$ANDROID_HOME "platform-tools" "build-tools;${ANDROID_BUILD_TOOLS_VERSION}" "platforms;android-${ANDROID_PLATFORMS_VERSION}"
+    && $ANDROID_HOME/cmdline-tools/bin/sdkmanager --sdk_root=$ANDROID_HOME \
+        "platform-tools" \
+        "build-tools;34.0.0" \
+        "build-tools;35.0.0" \
+        "build-tools;${ANDROID_BUILD_TOOLS_VERSION}" \
+        "platforms;android-34" \
+        "platforms;android-35" \
+        "platforms;android-${ANDROID_PLATFORMS_VERSION}"
 ENV PATH=$PATH:${ANDROID_HOME}/cmdline-tools:${ANDROID_HOME}/platform-tools
 
 # Install NodeJS

@@ -24,7 +24,7 @@ docker pull capgo/capacitor:latest
 Build from GitHub:  
 
 ```
-docker build -t Cap-go/docker-capacitor https://github.com/robingenz/docker-capacitor.git#main
+docker build -t Cap-go/docker-capacitor https://github.com/Cap-go/docker-capacitor.git#main
 ```
 
 Available build arguments:  
