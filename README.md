@@ -32,9 +32,9 @@ Available build arguments:
 - JAVA_VERSION (Default: `21`)
 - NODEJS_VERSION (Default: `24`)
 - ANDROID_SDK_VERSION (Default: `11076708`)
-- ANDROID_BUILD_TOOLS_VERSION (Default: `34.0.0`)
-- ANDROID_PLATFORMS_VERSION (Default: `34`)
-- GRADLE_VERSION (Default: `8.2.1`)
+- ANDROID_BUILD_TOOLS_VERSION (Default: `36.0.0`)
+- ANDROID_PLATFORMS_VERSION (Default: `36`)
+- GRADLE_VERSION (Default: `8.11.1`)
 - IONIC_VERSION (Default: `7.2.0`)
 - CAPACITOR_VERSION (Default: `7.4.3`)
 
